@@ -59,17 +59,20 @@ class Connect4Env:
         if action is None:
             self._resigned()
             return self.board, {}
-
+        invalid=True
         for i in range(6):
             if self.board[i][action] == ' ':
                 self.board[i][action] = ('X' if self.player_turn() == Player.white else 'O')
+                invalid = False
                 break
-
-        self.turn += 1
+        if not invalid:
+            self.turn += 1
+        else:
+            pass
 
         self.check_for_fours()
 
-        if self.turn > 42:
+        if self.turn >= 42:
             self.done = True
             if self.winner is None:
                 self.winner = Winner.draw

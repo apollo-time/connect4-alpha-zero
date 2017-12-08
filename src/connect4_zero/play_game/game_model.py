@@ -43,6 +43,8 @@ class PlayWithHuman:
             try:
                 movement = input('\nEnter your movement (1, 2, 3, 4, 5, 6, 7): ')
                 movement = int(movement) - 1
+                if movement < 0:
+                    return movement
                 legal_moves = env.legal_moves()
                 if legal_moves[int(movement)] == 1:
                     return int(movement)

@@ -82,11 +82,17 @@ class Connect4Model:
     def load(self, config_path, weight_path):
         if os.path.exists(config_path) and os.path.exists(weight_path):
             logger.debug(f"loading model from {config_path}")
-            with open(config_path, "rt") as f:
-                self.model = Model.from_config(json.load(f))
-            self.model.load_weights(weight_path)
-            self.digest = self.fetch_digest(weight_path)
-            logger.debug(f"loaded model digest = {self.digest}")
+            model = self.model
+            try:
+                with open(config_path, "rt") as f:
+                    self.model = Model.from_config(json.load(f))
+                self.model.load_weights(weight_path)
+                self.digest = self.fetch_digest(weight_path)
+                logger.debug(f"loaded model digest = {self.digest}")
+            except Exception as e:
+                logger.error(f"loading model error {e}")
+                self.model = model
+
             return True
         else:
             logger.debug(f"model files does not exist at {config_path} and {weight_path}")

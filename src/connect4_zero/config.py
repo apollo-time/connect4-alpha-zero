@@ -65,7 +65,7 @@ class PlayWithHumanConfig:
         self.simulation_num_per_move = 50
         self.thinking_loop = 3
         self.logging_thinking = True
-        self.c_puct = 2
+        self.c_puct = 1
         self.parallel_search_num = 4
         self.noise_eps = 0
         self.change_tau_turn = 0

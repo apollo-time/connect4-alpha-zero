@@ -30,8 +30,7 @@ class SelfPlayWorker:
         self.config = config
         self.model = model
         self.env = env     # type: Connect4Env
-        self.black = None  # type: Connect4Player
-        self.white = None  # type: Connect4Player
+        self.player = None  # type: Connect4Player
         self.buffer = []
 
     def start(self):
@@ -53,13 +52,9 @@ class SelfPlayWorker:
 
     def start_game(self, idx):
         self.env.reset()
-        self.black = Connect4Player(self.config, self.model)
-        self.white = Connect4Player(self.config, self.model)
+        self.player = Connect4Player(self.config, self.model)
         while not self.env.done:
-            if self.env.player_turn() == Player.black:
-                action = self.black.action(self.env.board)
-            else:
-                action = self.white.action(self.env.board)
+            action = self.player.action(self.env.board)
             self.env.step(action)
         self.finish_game()
         self.save_play_data(write=idx % self.config.play_data.nb_game_in_file == 0)
@@ -67,7 +62,7 @@ class SelfPlayWorker:
         return self.env
 
     def save_play_data(self, write=True):
-        data = self.black.moves + self.white.moves
+        data = self.player.moves
         self.buffer += data
 
         if not write:
@@ -88,15 +83,14 @@ class SelfPlayWorker:
             os.remove(files[i])
 
     def finish_game(self):
-        if self.env.winner == Winner.black:
-            black_win = 1
-        elif self.env.winner == Winner.white:
-            black_win = -1
+        if self.env.winner == Winner.draw:
+            win = 0
+        elif self.env.winner == self.env.player_turn():
+            win = 1
         else:
-            black_win = 0
+            win = -1
 
-        self.black.finish_game(black_win)
-        self.white.finish_game(-black_win)
+        self.player.finish_game(win)
 
     def load_model(self):
         from connect4_zero.agent.model_connect4 import Connect4Model
